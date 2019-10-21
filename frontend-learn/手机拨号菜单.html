@@ -222,6 +222,15 @@
         #da{
             font-size: 20px;
         }
+        #frame{
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            display: none;
+            left: 0;
+            border: none;
+        }
     </style>
     <script>
         /*发布订阅传参*/
@@ -794,7 +803,7 @@
                     <div>设置</div>
                 </div>
                 <div class="mobile-index-main-item">
-                    <div><img src="images/Weibo.png"></div>
+                    <div onclick="to('https://m.weibo.cn/')"><img src="images/Weibo.png"></div>
                     <div>微博</div>
                 </div>
                 <div class="mobile-index-main-item">
@@ -931,7 +940,14 @@
             </div>
         </div>
     </div>
+    <iframe id="frame"></iframe>
     <script>
+        function to(url) {
+            window.location.hash = '/'+url
+            document.getElementById('frame').style.display = 'block'
+            document.getElementById('frame').src = url
+        }
+        /*********************************/
         let selectors = document.querySelectorAll(".in")
         let n1 = document.getElementById('n1')
         let n2 = document.getElementById('n2')
