@@ -65,21 +65,25 @@
         .header{
             position: fixed;
             width: 100%;
-            height: 68px;
+            height: 180px;
             background-color: #8ae38a;
+            background-image: url("images/banner.png");
+            background-size: 100%;
+            background-repeat: no-repeat;
             top: 0;
             left: 0;
             display: flex;
             color: white;
         }
         .content{
-            margin-top: 68px;
+            margin-top: 180px;
             width: 68%;
             margin-left: auto;
             margin-right: auto;
             display: flex;
             align-self: flex-start;
-            background-color: #f4f4f4;
+            background-color: #fcfcfc;
+            box-shadow: 4px 7px 2px #d9d9d9;
         }
         .content-left{
             flex: 1;
@@ -90,10 +94,75 @@
         .content-left-info{
             margin: 10px;
             background-color: #ffffff;
-            width: 100%;
+            width: 94%;
+            box-shadow: 0 0 14px #eaeaea;
         }
         .content-left-info-title{
+            text-align: left;
+            background-color: #94c4b8;
+            padding: 5px 10px;
+            color: white;
+            text-shadow: 1px 2px 2px #a3a3a3;
+            background-image: linear-gradient(150deg,#4893b2,#94c4b8);
+        }
+        .content-right-item{
+            margin: 1%;
+            min-height: 40px;
+            width: 98%;
+            background-color: white;
+            box-shadow: 0 0 4px #c0c0c0;
+        }
+        .name{
+            padding: 10px;
+            font-size: 30px;
+            font-weight: bold;
+            text-shadow: 5px 5px 6px #012a2f;
+            font-family: 华文楷体;
+            line-height: 240px;
             text-align: center;
+            margin-left: 20%;
+            background-image: url("images/timg.png");
+            background-size: 188%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .sign{
+            font-family: "Tempus Sans ITC";
+            font-size: 20px;
+            font-weight: bold;
+            background-image: -webkit-linear-gradient(left,#F44336,#fd8403,yellow);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 16px 16px 3px #607D8B;
+            margin: auto;
+        }
+        .list-item0{
+            padding: 3px 10px;
+            border-bottom: 4px solid;
+            border-image: linear-gradient(90deg, rgba(0,216,247,0.00) 0%, #00AFED 100%) 2 2 2 2;
+            border-image: -webkit-linear-gradient(90deg, rgba(0,216,247,0.00) 0%, #00AFED 100%) 2 2 2 2;
+            border-image: -moz-linear-gradient(90deg, rgba(0,216,247,0.00) 0%, #00AFED 100%) 2 2 2 2;
+        }
+        .classify{
+            color: white;
+            margin: 0;
+            text-align: center;
+            padding: 10px;
+            background-image: linear-gradient(150deg,#4893b2,#94c4b8);
+            border-bottom: 2px dashed #86de86;
+        }
+        .content-right-item:first-child{
+            margin-top: 10px;
+        }
+        .date-row{
+            display: flex;
+        }
+        .date-col{
+            flex: 1;
+            width: 20px;
+            height: 20px;
+            background-color: #94c4b8;
+            font-size: 14px;
         }
     </style>
     <script>
@@ -156,18 +225,112 @@
     </script>
 </head>
 <body>
-<div class="header">vblog，vv</div>
+<div class="header">
+    <div class="name">记忆碎片</div>
+    <div class="sign">I am a slow walker,but I never walk backwards.</div>
+    <div id="date" class="date">
+
+    </div>
+    <script>
+        let date = document.getElementById('date')
+        let count = 0
+        for(let i = 0;i < 5;i++){
+            let div = document.createElement('div')
+            div.className = `date-row`
+            for(let j = 0;j < 15;j++){
+                let d = document.createElement('div')
+                d.className = `date-col col-${count}`
+                if(j == 3 || j == 7 || j == 11){
+                    d.className = `date-col col-blank`
+                }else{
+                    count++
+                }
+                div.appendChild(d)
+            }
+            date.appendChild(div)
+        }
+        function flash(num) {
+            let prenum = num-1
+            if(num == 0){
+                prenum = 59
+            }
+            let preparedom = document.querySelector(`.col-${prenum}`)
+            preparedom.style.backgroundColor = '#94c4b8'
+            let dom = document.querySelector(`.col-${num}`)
+            dom.style.backgroundColor = '#ff6'
+        }
+        setInterval(()=>{
+          let da = new Date()
+          flash(da.getSeconds())
+        },1000)
+        function setTime(num,y1,y2){
+            switch (num){
+                case 0:
+                    for(let i = 0;i < 5;i++){
+                        for(let j = y1; j <= y2;j++ ){
+                            let num = i*10+j+i*2
+                            let dom = document.querySelector(`.col-${num}`)
+                            if(i !== 0 && i !== 4){
+                                if(j !== (y1+y2)/2){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                            }else{
+                                dom.style.backgroundColor = '#3af'
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        setTime(0,0,2)
+    </script>
+</div>
 <div class="content">
     <div class="content-left">
         <div class="content-left-info">
+            <h3 class="classify">分类</h3>
             <div class="content-left-info-title">个人信息</div>
-            <div>
+            <div class="list-item0">
+                我是一个幸运小猪猪
+            </div>
+            <div class="list-item0">
+                我是一个幸运小猪猪
+            </div>
+            <div class="list-item0">
+                我是一个幸运小猪猪
+            </div>
+            <div class="content-left-info-title">杂文</div>
+            <div class="list-item0">
+                我是一个幸运小猪猪
+            </div>
+            <div class="list-item0">
+                我是一个幸运小猪猪
+            </div>
+            <div class="list-item0">
+                我是一个幸运小猪猪
+            </div>
+            <div class="content-left-info-title">杂文</div>
+            <div class="list-item0">
+                我是一个幸运小猪猪
+            </div>
+            <div class="list-item0">
+                我是一个幸运小猪猪
+            </div>
+            <div class="list-item0">
+                我是一个幸运小猪猪
             </div>
         </div>
         <button id="show">弹出来</button>
     </div>
     <div class="content-right">
-
+        <div class="content-right-item"></div>
+        <div class="content-right-item"></div>
+        <div class="content-right-item"></div>
+        <div class="content-right-item"></div>
+        <div class="content-right-item"></div>
+        <div class="content-right-item"></div>
     </div>
 
 </div>
