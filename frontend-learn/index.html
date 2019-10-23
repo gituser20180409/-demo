@@ -126,6 +126,10 @@
             background-repeat: no-repeat;
             background-position: center;
         }
+        .middle{
+            align-self: center;
+            padding: 0 14%;
+        }
         .sign{
             font-family: "Tempus Sans ITC";
             font-size: 20px;
@@ -154,16 +158,21 @@
         .content-right-item:first-child{
             margin-top: 10px;
         }
+        .date{
+            align-self: flex-end;
+            padding: 20px;
+        }
         .date-row{
             display: flex;
+            background-color: #94c4b800;
         }
         .date-col{
             flex: 1;
-            width: 20px;
-            height: 20px;
-            background-color: #94c4b8;
-            font-size: 14px;
+            width: 10px;
+            height: 10px;
+            font-size: 8px;
         }
+
     </style>
     <script>
         function createDialog(props={}){
@@ -227,64 +236,530 @@
 <body>
 <div class="header">
     <div class="name">记忆碎片</div>
-    <div class="sign">I am a slow walker,but I never walk backwards.</div>
+    <div class="middle">
+        <div class="sign">I am a slow walker,but I never walk backwards.</div>
+        <div class="sign">&nbsp;&nbsp;&nbsp;&nbsp;I am a slow walker,but I never walk backwards.</div>
+    </div>
+
     <div id="date" class="date">
 
     </div>
     <script>
-        let date = document.getElementById('date')
-        let count = 0
-        for(let i = 0;i < 5;i++){
-            let div = document.createElement('div')
-            div.className = `date-row`
-            for(let j = 0;j < 15;j++){
-                let d = document.createElement('div')
-                d.className = `date-col col-${count}`
-                if(j == 3 || j == 7 || j == 11){
-                    d.className = `date-col col-blank`
-                }else{
-                    count++
-                }
-                div.appendChild(d)
+        class Clock{
+            /**
+             * @param dom
+             * @param color
+             */
+            constructor(dom,color){
+                this.container = dom
+                this.color = color || 'red'
+                this.init()
             }
-            date.appendChild(div)
-        }
-        function flash(num) {
-            let prenum = num-1
-            if(num == 0){
-                prenum = 59
-            }
-            let preparedom = document.querySelector(`.col-${prenum}`)
-            preparedom.style.backgroundColor = '#94c4b8'
-            let dom = document.querySelector(`.col-${num}`)
-            dom.style.backgroundColor = '#ff6'
-        }
-        setInterval(()=>{
-          let da = new Date()
-          flash(da.getSeconds())
-        },1000)
-        function setTime(num,y1,y2){
-            switch (num){
-                case 0:
-                    for(let i = 0;i < 5;i++){
-                        for(let j = y1; j <= y2;j++ ){
-                            let num = i*10+j+i*2
-                            let dom = document.querySelector(`.col-${num}`)
-                            if(i !== 0 && i !== 4){
-                                if(j !== (y1+y2)/2){
-                                    dom.style.backgroundColor = '#3af'
-                                }
-                            }else{
-                                dom.style.backgroundColor = '#3af'
+            shadow(){
+                let count = 0;
+                for(let i = 0;i < 12;i++){
+                    for(let j = 0;j < 5;j++){
+                        let dom = document.querySelector(`.col-${count}`)
+                        dom.addEventListener('mouseover',()=>{
+                            if(dom.style.backgroundColor !== "rgba(255, 255, 255, 0)"){
+                                dom.style.boxShadow = '0 0 3px #ff0';
+                                setTimeout(()=>{
+                                    dom.style.boxShadow = 'none';
+                                },500)
                             }
+                        })
+                        count++;
+                    }
+                }
+            }
+            init(){
+                if(!this.container){
+                    throw new Error('dom找不着')
+                }
+                this.createDom()
+                setTimeout(()=>{
+                    this.shadow()
+                },0)
+                setInterval(()=>{
+                    let da = new Date()
+                    let hour = da.getHours().toString()
+                    let minute = da.getMinutes().toString()
+                    let h1 = hour[1] ? Number(hour[0]) : 0
+                    let h2 = hour[1] ? Number(hour[1]) : Number(hour[0])
+                    let m1 = minute[1] ? Number(minute[0]) : 0
+                    let m2 = minute[1] ? Number(minute[1]) : Number(minute[0])
+                    this.flash(da.getSeconds())
+                    this.setTime(h1,0,2)
+                    this.setTime(h2,3,5)
+                    this.setTime(m1,6,8)
+                    this.setTime(m2,9,11)
+                    this.light()
+                },1000)
+            }
+            light(){
+                let i = 0;
+                let timmer = setInterval(()=>{
+                    if (i >= 12) {
+                        clearInterval(timmer)
+                        return
+                    }
+                    for (let j = 0; j < 5; j++) {
+                        let dom = document.querySelector(`.col-${j * 12 + i}`)
+                        if (dom.style.backgroundColor !== "rgba(255, 255, 255, 0)") {
+                            dom.style.boxShadow = '0 0 3px #ff0';
+                            setTimeout(() => {
+                                dom.style.boxShadow = 'none';
+                            }, 150)
                         }
                     }
-                    break;
-                default:
-                    break;
+                    i++;
+                },80)
+                /*for(let i = 0;i < 12;i++){
+                    for(let j = 0;j < 5;j++){
+                        let dom = document.querySelector(`.col-${j*12+i}`)
+                        if(dom.style.backgroundColor !== "rgba(255, 255, 255, 0)"){
+                            dom.style.boxShadow = '0 0 3px #ff0';
+                            setTimeout(()=>{
+                                dom.style.boxShadow = 'none';
+                            },250)
+                        }
+                    }
+                }*/
+            }
+            createDom(){//创建容器
+                let count = 0
+                for(let i = 0;i < 5;i++){
+                    let div = document.createElement('div')
+                    div.className = `date-row`
+                    for(let j = 0;j < 15;j++){
+                        let d = document.createElement('div')
+                        d.className = `date-col col-${count}`
+                        if(j == 3 || j == 7 || j == 11){
+                            d.className = `date-col col-blank`
+                        }else{
+                            count++
+                        }
+                        div.appendChild(d)
+                    }
+                    this.container.appendChild(div)
+                }
+            }
+            flash(num) {//提示秒
+                let prenum = num-1
+                if(num == 0){
+                    prenum = 59
+                }
+                let preparedom = document.querySelector(`.col-${prenum}`)
+                preparedom.innerHTML = ''
+                let dom = document.querySelector(`.col-${num}`)
+                dom.innerHTML = num.toString().length > 1 ? num : '0'+num
+            }
+            /**
+             * 显示时间，根据传入的不同数字以及位移改变dom的背景色
+             * @param num
+             * @param x1 位移值
+             * @param x2 x1+2 = x2
+             * 例如，传入的是0，x1坐标为0，则在0-2这块区域内绘制数字
+             */
+            setTime(num,y1,y2){
+                switch (num){
+                    case 0:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#fff0'
+                                if(i !== 0 && i !== 4){
+                                    if(j !== (y1+y2)/2){
+                                        dom.style.backgroundColor = this.color
+                                    }
+                                }else{
+                                    dom.style.backgroundColor = this.color
+                                }
+                            }
+                        }
+                        break
+                    case 1:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#fff0'
+                                if(j === (y1+y2)/2){
+                                    dom.style.backgroundColor = this.color
+                                }
+                                if(i === 1 && j === y1){
+                                    dom.style.backgroundColor = this.color
+                                }
+                                if(i === 4){
+                                    dom.style.backgroundColor = this.color
+                                }
+                            }
+                        }
+                        break
+                    case 2:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#fff0'
+                                if(i%2 === 0){
+                                    dom.style.backgroundColor = this.color
+                                }
+                                if(i === 1 && j === y2){
+                                    dom.style.backgroundColor = this.color
+                                }
+                                if(i === 3 && j === y1){
+                                    dom.style.backgroundColor = this.color
+                                }
+                            }
+                        }
+                        break
+                    case 3:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#fff0'
+                                if(i%2 === 0){
+                                    dom.style.backgroundColor = this.color
+                                }
+                                if(i%2 === 1 && j === y2){
+                                    dom.style.backgroundColor = this.color
+                                }
+                            }
+                        }
+                        break
+                    case 4:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#fff0'
+                                if(i<2 && j !== (y1+y2)/2){
+                                    dom.style.backgroundColor = this.color
+                                }
+                                if(i === 2){
+                                    dom.style.backgroundColor = this.color
+                                }
+                                if(i>2 && j === y2){
+                                    dom.style.backgroundColor = this.color
+                                }
+                            }
+                        }
+                        break
+                    case 5:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#fff0'
+                                if(i%2 === 0){
+                                    dom.style.backgroundColor = this.color
+                                }
+                                if(i === 3 && j === y2){
+                                    dom.style.backgroundColor = this.color
+                                }
+                                if(i === 1 && j === y1){
+                                    dom.style.backgroundColor = this.color
+                                }
+                            }
+                        }
+                        break
+                    case 6:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#fff0'
+                                if(i%2 === 0){
+                                    dom.style.backgroundColor = this.color
+                                }
+                                if(i === 1 && j === y1){
+                                    dom.style.backgroundColor = this.color
+                                }
+                                if(i === 3 && j !== (y1+y2)/2){
+                                    dom.style.backgroundColor = this.color
+                                }
+                            }
+                        }
+                        break
+                    case 7:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#fff0'
+                                if(i === 0){
+                                    dom.style.backgroundColor = this.color
+                                }else if(j === y2){
+                                    dom.style.backgroundColor = this.color
+                                }
+                            }
+                        }
+                        break
+                    case 8:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#fff0'
+                                if(i%2 === 0){
+                                    dom.style.backgroundColor = this.color
+                                }else if(j !== (y1+y2)/2){
+                                    dom.style.backgroundColor = this.color
+                                }
+                            }
+                        }
+                        break
+                    case 9:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#fff0'
+                                if(i%2 === 0){
+                                    dom.style.backgroundColor = this.color
+                                }
+                                if(i === 1 && j !== (y1+y2)/2){
+                                    dom.style.backgroundColor = this.color
+                                }
+                                if(i === 3 && j === y2){
+                                    dom.style.backgroundColor = this.color
+                                }
+                            }
+                        }
+                        break
+                    default:
+                        break
+                }
             }
         }
-        setTime(0,0,2)
+        new Clock(document.getElementById('date'),'#69a4aa')
+        let createTime = (function (dom){
+            let date = dom
+            let count = 0
+            for(let i = 0;i < 5;i++){
+                let div = document.createElement('div')
+                div.className = `date-row`
+                for(let j = 0;j < 15;j++){
+                    let d = document.createElement('div')
+                    d.className = `date-col col-${count}`
+                    if(j == 3 || j == 7 || j == 11){
+                        d.className = `date-col col-blank`
+                    }else{
+                        count++
+                    }
+                    div.appendChild(d)
+                }
+                date.appendChild(div)
+            }
+            function flash(num) {
+                let prenum = num-1
+                if(num == 0){
+                    prenum = 59
+                }
+                let preparedom = document.querySelector(`.col-${prenum}`)
+                //preparedom.style.backgroundColor = '#94c4b8'
+                preparedom.innerHTML = ''
+                let dom = document.querySelector(`.col-${num}`)
+                //dom.style.backgroundColor = '#ff6'
+
+                dom.innerHTML = num.toString().length > 1 ? num : '0'+num
+            }
+            setInterval(()=>{
+                let da = new Date()
+                let hour = da.getHours().toString()
+                let minute = da.getMinutes().toString()
+                let h1 = hour[1] ? Number(hour[0]) : 0
+                let h2 = hour[1] ? Number(hour[1]) : Number(hour[0])
+                let m1 = minute[1] ? Number(minute[0]) : 0
+                let m2 = minute[1] ? Number(minute[1]) : Number(minute[0])
+                flash(da.getSeconds())
+                setTime(h1,0,2)
+                setTime(h2,3,5)
+                setTime(m1,6,8)
+                setTime(m2,9,11)
+            },1000)
+            function setTime(num,y1,y2){
+                switch (num){
+                    case 0:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#94c4b8'
+                                if(i !== 0 && i !== 4){
+                                    if(j !== (y1+y2)/2){
+                                        dom.style.backgroundColor = '#3af'
+                                    }
+                                }else{
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                            }
+                        }
+                        break
+                    case 1:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#94c4b8'
+                                if(j === (y1+y2)/2){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                                if(i === 1 && j === y1){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                                if(i === 4){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                            }
+                        }
+                        break
+                    case 2:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#94c4b8'
+                                if(i%2 === 0){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                                if(i === 1 && j === y2){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                                if(i === 3 && j === y1){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                            }
+                        }
+                        break
+                    case 3:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#94c4b8'
+                                if(i%2 === 0){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                                if(i%2 === 1 && j === y2){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                            }
+                        }
+                        break
+                    case 4:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#94c4b8'
+                                if(i<2 && j !== (y1+y2)/2){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                                if(i === 2){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                                if(i>2 && j === y2){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                            }
+                        }
+                        break
+                    case 5:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#94c4b8'
+                                if(i%2 === 0){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                                if(i === 3 && j === y2){
+                                    dom.style.backgroundColor = '#3af'
+                                    break
+                                }
+                                if(i === 1 && j === y1){
+                                    dom.style.backgroundColor = '#3af'
+                                    break
+                                }
+                            }
+                        }
+                        break
+                    case 6:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#94c4b8'
+                                if(i%2 === 0){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                                if(i === 1 && j === y1){
+                                    dom.style.backgroundColor = '#3af'
+                                    break
+                                }
+                                if(i === 3 && j !== (y1+y2)/2){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                            }
+                        }
+                        break
+                    case 7:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#94c4b8'
+                                if(i === 0){
+                                    dom.style.backgroundColor = '#3af'
+                                }else if(j === y2){
+                                    dom.style.backgroundColor = '#3af'
+                                    break
+                                }
+                            }
+                        }
+                        break
+                    case 8:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#94c4b8'
+                                if(i%2 === 0){
+                                    dom.style.backgroundColor = '#3af'
+                                }else if(j !== (y1+y2)/2){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                            }
+                        }
+                        break
+                    case 9:
+                        for(let i = 0;i < 5;i++){
+                            for(let j = y1; j <= y2;j++ ){
+                                let num = i*10+j+i*2
+                                let dom = document.querySelector(`.col-${num}`)
+                                dom.style.backgroundColor = '#94c4b8'
+                                if(i%2 === 0){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                                if(i === 1 && j !== (y1+y2)/2){
+                                    dom.style.backgroundColor = '#3af'
+                                }
+                                if(i === 3 && j === y2){
+                                    dom.style.backgroundColor = '#3af'
+                                    break
+                                }
+                            }
+                        }
+                        break
+                    default:
+                        break
+                }
+            }
+        })
     </script>
 </div>
 <div class="content">
